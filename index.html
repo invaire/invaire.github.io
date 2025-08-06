@@ -107,5 +107,22 @@
       });
     });
   </script>
+  <script>
+  document.querySelectorAll('.cell input').forEach((input, index, inputs) => {
+    input.addEventListener('input', () => {
+      if (input.value.length === 1) {
+        const next = inputs[index + 1];
+        if (next) next.focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && input.value === '') {
+        const prev = inputs[index - 1];
+        if (prev) prev.focus();
+      }
+    });
+  });
+</script>
 </body>
 </html>
