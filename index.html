@@ -57,6 +57,14 @@
         transform: scale(0.85);
       }
     }
+    .number {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-size: 0.6em;
+  color: #222;
+  opacity: 0.8;
+}
   </style>
 </head>
 <body>
@@ -111,10 +119,17 @@
       cell.classList.add('cell');
       cell.dataset.letter = w.text[k];
       if (k === 0) {
-        cell.classList.add('start');
-        cell.title = 'Нажмите, чтобы ответить';
-        cell.dataset.index = i;
-        cell.addEventListener('click', startInput);
+  cell.classList.add('start');
+  cell.title = 'Нажмите, чтобы ответить';
+  cell.dataset.index = i;
+  cell.addEventListener('click', startInput);
+
+  // ⬇️ Добавляем номер слова в ячейку
+  const number = document.createElement('div');
+  number.textContent = (i + 1);
+  number.classList.add('number');
+  cell.appendChild(number);
+}
       }
     }
   });
