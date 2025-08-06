@@ -1,80 +1,63 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Новогодний кроссворд</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>❄️ Новогодний кроссворд ❄️</title>
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #fefcfa;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background-color: #fefcf9;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
       padding: 20px;
     }
-
     h1 {
-      color: #b33b3b;
-      margin-bottom: 10px;
+      color: #aa2b2b;
     }
-
-    .crossword {
+    .question {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    .grid {
+      margin: 20px auto;
       display: grid;
-      grid-template-columns: repeat(6, 40px);
-      grid-template-rows: repeat(6, 40px);
+      grid-template-columns: repeat(8, 40px);
+      grid-template-rows: repeat(8, 40px);
       gap: 2px;
-      margin: 20px 0;
     }
-
     .cell {
       width: 40px;
       height: 40px;
       border: 1px solid #ccc;
-      text-align: center;
       font-size: 20px;
       text-transform: uppercase;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+    .active {
       background-color: white;
-    }
-
-    .cell[disabled] {
-      background-color: #eee;
-    }
-
-    .clue {
-      margin-top: 10px;
-      font-size: 16px;
-    }
-
-    .clue img {
-      max-height: 100px;
-      margin-top: 8px;
     }
   </style>
 </head>
 <body>
   <h1>❄️ Новогодний кроссворд ❄️</h1>
+  <p class="question"> Подсказка: Кто приносит подарки на Новый год?</p>
+  <img src="https://cdn-icons-png.flaticon.com/512/5903/5903964.png" alt="Подсказка" width="80" />
 
-  <div class="clue">
-    Подсказка: Кто приносит подарки на Новый год? <br />
-    <img src="https://cdn-icons-png.flaticon.com/512/3213/3213701.png" alt="Дед Мороз" />
-  </div>
-
-  <div class="crossword">
-    <input class="cell" maxlength="1" />
-    <input class="cell" maxlength="1" />
-    <input class="cell" maxlength="1" />
-    <input class="cell" maxlength="1" />
-    <input class="cell" maxlength="1" />
-    <input class="cell" maxlength="1" />
-
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
+  <div class="grid">
+    <!-- Заполняем вручную, какие ячейки активные (для ввода) -->
+    <input class="cell active" />
+    <input class="cell active" />
+    <input class="cell active" />
+    <input class="cell active" />
+    <input class="cell active" />
+    <input class="cell active" />
+    <input class="cell active" />
     <input class="cell" disabled />
 
+    <!-- Остальные пустые -->
+    <input class="cell" disabled />
+    <input class="cell" disabled />
     <input class="cell" disabled />
     <input class="cell" disabled />
     <input class="cell" disabled />
@@ -82,26 +65,8 @@
     <input class="cell" disabled />
     <input class="cell" disabled />
 
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
-    <input class="cell" disabled />
+    <!-- И так далее, пока вся сетка не будет заполнена -->
+    <!-- Здесь 8x8, но можно изменить -->
   </div>
 </body>
 </html>
