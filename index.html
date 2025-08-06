@@ -6,94 +6,102 @@
   <title>Новогодний кроссворд</title>
   <style>
     body {
-      margin: 0;
-      padding: 0 0 10px;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #fefcfa;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background-color: #fefcfa;
-      font-family: "Segoe UI", sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
+      padding: 20px;
     }
 
-    iframe {
-      width: 100%;
-      max-width: 1200px;
-      border: none;
+    h1 {
+      color: #b33b3b;
+      margin-bottom: 10px;
     }
 
-    .info, .fallback {
-      font-size: 18px;
-      background-color: #fff0f5;
-      border-radius: 12px;
-      padding: 10px 16px;
-      margin: 15px 0 10px;
-      box-shadow: 0 0 12px #f4c3d6;
+    .crossword {
+      display: grid;
+      grid-template-columns: repeat(6, 40px);
+      grid-template-rows: repeat(6, 40px);
+      gap: 2px;
+      margin: 20px 0;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
       text-align: center;
-      max-width: 700px;
-      line-height: 1.5;
+      font-size: 20px;
+      text-transform: uppercase;
+      background-color: white;
     }
 
-    .fallback {
-      display: none;
+    .cell[disabled] {
+      background-color: #eee;
     }
 
-    img {
-      width: 100%;
-      max-width: 700px;
-      height: auto;
-      object-fit: contain;
+    .clue {
+      margin-top: 10px;
+      font-size: 16px;
     }
 
-    @media (min-width: 768px) {
-      iframe { height: 85vh; }
-    }
-
-    @media (max-width: 767px) {
-      iframe { height: 75vh; }
-      img { max-height: 150px; }
+    .clue img {
+      max-height: 100px;
+      margin-top: 8px;
     }
   </style>
 </head>
 <body>
-  <!-- Кроссворд -->
-  <iframe id="crossword" src="https://crossword.labirintschool.ru/?id=2053270"></iframe>
+  <h1>❄️ Новогодний кроссворд ❄️</h1>
 
-  <!-- Заглушка -->
-  <div class="fallback" id="fallback">
-    Кроссворд временно недоступен 🧚 Волшебные снежинки пока колдуют над кроссвордом…<br />
-    Скоро всё оживёт! Загляните чуть позже или обновите страничку ✨
+  <div class="clue">
+    Подсказка: Кто приносит подарки на Новый год? <br />
+    <img src="https://cdn-icons-png.flaticon.com/512/3213/3213701.png" alt="Дед Мороз" />
   </div>
 
-  <!-- Приветствие -->
-  <div class="info">
-    Добро пожаловать в новогоднее приключение! ✨<br />
-    Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄
+  <div class="crossword">
+    <input class="cell" maxlength="1" />
+    <input class="cell" maxlength="1" />
+    <input class="cell" maxlength="1" />
+    <input class="cell" maxlength="1" />
+    <input class="cell" maxlength="1" />
+    <input class="cell" maxlength="1" />
+
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
+    <input class="cell" disabled />
   </div>
-
-  <!-- Гирлянда -->
-  <img src="https://invair.github.io/long-garland.png" alt="Новогодняя гирлянда" />
-
-  <script>
-    const iframe = document.getElementById('crossword');
-    const fallback = document.getElementById('fallback');
-
-    // Проверка, загрузился ли iframe
-    const testIframe = document.createElement('iframe');
-    testIframe.style.display = 'none';
-    testIframe.src = iframe.src;
-
-    testIframe.onload = () => {
-      // Загружено успешно
-    };
-
-    testIframe.onerror = () => {
-      iframe.style.display = 'none';
-      fallback.style.display = 'block';
-    };
-
-    document.body.appendChild(testIframe);
-  </script>
 </body>
 </html>
