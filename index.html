@@ -25,8 +25,8 @@
       display: grid;
       grid-template-columns: repeat(11, 2.5em);
       grid-template-rows: repeat(17, 2.5em);
-      gap: 2px;
-      background: #444;
+      gap: 4px;
+      background: #f5f5f5;
       padding: 5px;
     }
     .cell {
@@ -41,9 +41,13 @@
       user-select: none;
       cursor: default;
       position: relative;
+      border-color: #222;
+      border-width: 1px;
+      border-style: dashed;
     }
     .cell.blank {
-      background: #444;
+      background: #f5f5f5;
+      border: none !important;
     }
     .cell.start {
       cursor: pointer;
@@ -58,107 +62,215 @@
       }
     }
     .number {
-  position: absolute;
-  top: 2px;
-  left: 3px;
-  font-size: 0.6em;
-  color: #222;
-  opacity: 0.8;
-}
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      font-size: 0.6em;
+      color: #222;
+      opacity: 0.8;
+    }
+
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    #user-answer {
+      width: 90%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+    #submit-answer {
+      margin-top: 10px;
+      padding: 8px 16px;
+    }
   </style>
 </head>
 <body>
 
-<h1>Волшебство в сердце</h1>
-<div class="crossword" id="crossword"></div>
+  <h1>Волшебство в сердце</h1>
+  <div class="crossword" id="crossword"></div>
 
-<script>
-  const rows = 17, cols = 11;
-  
-   const words = [
-  {text: 'СНЕГОВИК', row:1, col:2},
-  ...
-].map(w => ({...w, row: w.row - 1, col: w.col - 1}));
-    {text: 'КАКАО', row:2, col:3},
-    {text: 'ЕЛКА', row:3, col:6},
-    {text: 'МЕШОК', row:4, col:5},
-    {text: 'СНЕГ', row:5, col:5},
-    {text: 'БАЙБАЙ', row:6, col:4},
-    {text: 'САНКИ', row:7, col:7},
-    {text: 'КОНФЕТЫ', row:8, col:2},
-    {text: 'ОЛИВЬЕ', row:9, col:4},
-    {text: 'СНЕГУРОЧКА', row:10, col:1},
-    {text: 'СЕВЕР', row:11, col:5},
-    {text: 'САНКИ', row:12, col:7},
-    {text: 'ДЕТИ', row:13, col:6},
-    {text: 'ПОДАРОК', row:14, col:3},
-    {text: 'ЗВЕЗДА', row:15, col:3},
-    {text: 'ЗАЯЦ', row:16, col:4},
-    {text: 'ВЕДРО', row:17, col:6}
-  ];
+  <script>
+    let currentWord = null;
+    let modalOpen = false;
 
-  const container = document.getElementById('crossword');
-  const grid = [];
+    const modal = document.createElement('div');
+    modal.id = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="question-text"></p>
+        <img id="question-image" src="" alt="" style="max-width: 100%; display: none;"/>
+        <input type="text" id="user-answer" placeholder="Введите слово...">
+        <button id="submit-answer">ОК</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const 
+      modalOk = document.getElementById('submit-answer'),
+      modalInput = document.getElementById('user-answer');
 
-  for (let r = 0; r < rows; r++) {
-    grid[r] = [];
-    for (let c = 0; c < cols; c++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell blank';
-      cell.dataset.r = r;
-      cell.dataset.c = c;
-      container.appendChild(cell);
-      grid[r][c] = cell;
-    }
-  }
+    const container = document.getElementById('crossword');
 
-  words.forEach((w, i) => {
-    const len = w.text.length;
-    for (let k = 0; k < len; k++) {
-      const r = w.row;
-      const c = w.col + k;
-      const cell = grid[r][c];
-      cell.classList.remove('blank');
-      cell.classList.add('cell');
-      cell.dataset.letter = w.text[k];
-      if (k === 0) {
-  cell.classList.add('start');
-  cell.title = 'Нажмите, чтобы ответить';
-  cell.dataset.index = i;
-  cell.addEventListener('click', startInput);
+    const rows = 19, cols = 11;
+    const words = [
+      {text: 'СНЕГОВИК', q: 'Три снежных шарика и морковка', row: 0, col: 1},
+      {text: 'КАКАО', q: 'Шоколадный напиток', row: 1, col: 2},
+      {text: 'ЕЛКА', q: 'Хвойное дерево', row: 2, col: 5},
+      {text: 'МЕШОК', q: 'В нем приносят кота', row: 3, col: 4},
+      {text: 'СНЕГ', q: 'Зимой бывает', row: 4, col: 4},
+      {text: 'БАЙБАЙ', q: 'Спи елочка ...', row: 5, col: 3},
+      {text: 'САНКИ', q: 'На них везут елку', row: 6, col: 6},
+      {text: 'КОНФЕТЫ', q: 'Сладкие штучки', row: 7, col: 1},
+      {text: 'ОЛИВЬЕ', q: 'Любимый салат', row: 8, col: 3},
+      {text: 'СНЕГУРОЧКА', q: 'Женщина снеговика', row: 9, col: 0},
+      {text: '', q: '', row: 10, col: 0},
+      {text: 'СЕВЕР', q: 'Верхняя часть компаса', row: 11, col: 4},
+      {text: '', q: '', row: 12, col: 0},
+      {text: 'САНКИ', q: 'На них везут елку', row: 13, col: 6},
+      {text: 'ДЕТИ', q: 'Находят в капусте', row: 14, col: 5},
+      {text: 'ПОДАРОК', q: 'То что дарят', row: 15, col: 2},
+      {text: 'ЗВЕЗДА', q: 'Солнце', row: 16, col: 2},
+      {text: 'ЗАЯЦ', q: 'Ушастый', row: 17, col: 3},
+      {text: 'ВЕДРО', q: 'В нем несут воду', row: 18, col: 5}
+    ];
 
-  // ⬇️ Добавляем номер слова в ячейку
-  const number = document.createElement('div');
-  number.textContent = (i + 1);
-  number.classList.add('number');
-  cell.appendChild(number);
-}
+    const grid = [];
+    for (let r = 0; r < rows; r++) {
+      grid[r] = [];
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell blank';
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        container.appendChild(cell);
+        grid[r][c] = cell;
       }
     }
-  });
 
-  function startInput(e) {
-    const idx = e.currentTarget.dataset.index;
-    const w = words[idx];
-    const answer = prompt('Введите слово:', '');
-    if (!answer) return;
-    if (answer.trim().toUpperCase() === w.text.toUpperCase()) {
-      fillWord(w);
-    } else {
-      alert('Неправильно, попробуйте ещё.');
+    words.forEach((w, i) => {
+      const wordLength = w.text.length;
+
+      for (let k = 0; k < wordLength; k++) {
+        const r = w.row;
+        const c = w.col + k;
+        const cell = grid[r][c];
+
+        cell.classList.remove('blank');
+        cell.classList.add('cell');
+        cell.dataset.letter = w.text[k];
+        // cell.textContent = w.text[k];
+        
+        if (k === 0) {
+          cell.classList.add('start');
+          cell.title = 'Нажмите, чтобы ответить';
+          cell.dataset.index = i;
+          cell.addEventListener('click', startInput);
+
+          // ⬇️ Добавляем номер слова в ячейку
+          const number = document.createElement('div');
+          number.textContent = (i + 1);
+          number.classList.add('number');
+          cell.appendChild(number);
+        }
+      }
+    });
+
+    // тыкнули на цифру
+    function startInput(e) {
+      e.preventDefault();
+      const idx = e.currentTarget.dataset.index;
+      currentWord = words[idx];
+
+      document.getElementById('question-text').textContent = currentWord.q || 'Введите слово:';
+      modalInput.value = '';
+      document.getElementById('submit-answer').dataset.index = idx;
+
+      const imagePath = `images/${currentWord.text.toLowerCase()}.png`;
+      const img = document.getElementById('question-image');
+      img.src = imagePath;
+      img.style.display = 'block';
+
+      document.getElementById('modal').style.display = 'flex';
+      modalInput.focus();
+      modalOpen = true;
     }
-  }
 
-  function fillWord(w) {
-    for (let k = 0; k < w.text.length; k++) {
-      const r = w.row;
-      const c = w.col + k;
-      const cell = grid[r][c];
-      cell.textContent = w.text[k];
-      cell.classList.add('filled');
+    // проверка ответа
+    modalOk.onclick = checkAnswer;
+
+    // Закрытие модального окна
+    modal.querySelector('.close').onclick = closeModal;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+      if (e.key === 'Enter' && modalOpen) {
+        checkAnswer();
+
+        return;
+      }
+    });
+
+    function checkAnswer() {
+      if (!currentWord) {
+        return;
+      }
+
+      const userAnswer = modalInput.value.trim().toUpperCase();
+      if (userAnswer === currentWord.text) {
+        fillWord(currentWord);
+        closeModal();
+      } else {
+        alert('Неправильно, попробуйте ещё.');
+        modalInput.focus();
+      }
     }
-  }
-</script>
 
+    function closeModal() {
+      if (!modalOpen) {
+        return;
+      }
+      modal.style.display = 'none';
+      currentWord = null;
+      modalOpen = false;
+    }
+
+    // Заполняет клетки если правильно ввели
+    function fillWord(w) {
+      for (let k = 0; k < w.text.length; k++) {
+        const r = w.row;
+        const c = w.col + k;
+        const cell = grid[r][c];
+        
+        cell.textContent = w.text[k];
+        cell.classList.add('filled');
+      }
+    }
+  </script>
 </body>
 </html>
