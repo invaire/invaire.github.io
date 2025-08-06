@@ -5,61 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Новогодний кроссворд</title>
   <style>
-    /* Основной сброс и фон */
-body {
-  margin: 0;
-  padding: 0 0 5px;           /* снизу теперь 5px */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #fefcfa;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
+    /* Сброс + фон */
+    body {
+      margin: 0;
+      padding: 0 0 5px;         /* снизу 5px */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #fefcfa;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;        /* скролл, чтобы iframe не пропадал */
+    }
 
-iframe {
-  width: 100%;
-  max-width: 1200px;
-  border: none;
-}
+    /* Кроссворд */
+    iframe {
+      width: 100%;
+      max-width: 1200px;
+      border: none;
+    }
 
-.info {
-  font-family: "Segoe UI", sans-serif;
-  font-size: 18px;
-  background-color: #fff0f5;
-  border-radius: 12px;
-  padding: 10px 16px;
-  margin-top: 5px;           /* уменьшён */
-  box-shadow: 0 0 12px #f4c3d6;
-  text-align: center;
-  max-width: 700px;
-  line-height: 1.5;
-}
+    /* Приветственный блок */
+    .info {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 18px;
+      background-color: #fff0f5;
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-top: 5px;         /* маленький отступ */
+      box-shadow: 0 0 12px #f4c3d6;
+      text-align: center;
+      max-width: 700px;
+      line-height: 1.5;
+    }
 
-img {
-  width: 100%;
-  max-width: 700px;
-  height: auto;
-  max-height: 150px;         /* увеличили */
-  object-fit: contain;
-  margin-top: 10px;
-}
+    /* Гирлянда */
+    img {
+      width: 100%;
+      max-width: 700px;
+      height: auto;
+      max-height: 150px;       /* увеличили для красоты */
+      object-fit: contain;
+      margin-top: 10px;
+    }
 
-@media (min-width: 768px) {
-  iframe { height: 85vh; }
-}
+    /* Десктоп и планшеты */
+    @media (min-width: 768px) {
+      iframe {
+        height: 85vh;
+      }
+      /* на больших экранах отступ .info остаётся маленьким */
+    }
 
-@media (max-width: 767px) {
-  iframe { height: 75vh; }    /* вернули толерантную высоту */
-}{
-        height: 75vh;            /* специально для телефонов */
+    /* Мобильные телефоны */
+    @media (max-width: 767px) {
+      iframe {
+        height: 75vh;           /* достаточно места на мобилке */
       }
       .info {
-        margin-top: 15px;
+        margin-top: 15px;       /* чуть больше отступ для текста */
       }
       img {
-        max-height: 150px;       /* увеличиваем гирлянду на мобилке */
+        max-height: 150px;      /* высокая гирлянда на мобилке */
       }
     }
   </style>
@@ -76,7 +83,7 @@ img {
 
   <!-- гирлянда -->
   <img
-    src="https://cdn-glitch.global/b673fcfe-234d-4711-aefd-efec3e3780aa/png-klev-club-zldj-p-girlyanda-yelka-png-16.png?v=1726154927306"
+    src="https://cdn.glitch.global/b673fcfe-234d-4711-aefd-efec3e3780aa/png-klev-club-zldj-p-girlyanda-yelka-png-16.png?v=1726154927306"
     alt="Новогодняя гирлянда"
   />
 </body>
