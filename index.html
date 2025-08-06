@@ -5,86 +5,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Новогодний кроссворд</title>
   <style>
-    /* Сброс + фон */
     body {
       margin: 0;
-      padding: 0 0 5px;         /* снизу 5px */
+      padding: 0 0 5px;
       display: flex;
       flex-direction: column;
       align-items: center;
       background-color: #fefcfa;
       min-height: 100vh;
       overflow-x: hidden;
-      overflow-y: auto;        /* скролл, чтобы iframe не пропадал */
     }
 
-    /* Кроссворд */
     iframe {
       width: 100%;
       max-width: 1200px;
       border: none;
+      display: none; /* Скрыт по умолчанию */
     }
 
-    /* Приветственный блок */
     .info {
       font-family: "Segoe UI", sans-serif;
       font-size: 18px;
       background-color: #fff0f5;
       border-radius: 12px;
       padding: 10px 16px;
-      margin-top: 5px;         /* маленький отступ */
+      margin-top: 10px;
       box-shadow: 0 0 12px #f4c3d6;
       text-align: center;
       max-width: 700px;
       line-height: 1.5;
     }
 
-    /* Гирлянда */
     img {
       width: 100%;
       max-width: 700px;
       height: auto;
-      max-height: 150px;       /* увеличили для красоты */
+      max-height: 150px;
       object-fit: contain;
       margin-top: 10px;
     }
 
-    /* Десктоп и планшеты */
-    @media (min-width: 768px) {
-      iframe {
-        height: 85vh;
-      }
-      /* на больших экранах отступ .info остаётся маленьким */
+    .fallback {
+      margin-top: 20px;
+      color: #444;
+      background: #fff6f6;
+      border: 1px solid #ffcccc;
+      padding: 16px 24px;
+      border-radius: 10px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 16px;
+      display: none;
+      max-width: 700px;
+      text-align: center;
     }
 
-    /* Мобильные телефоны */
+    @media (min-width: 768px) {
+      iframe { height: 85vh; }
+    }
+
     @media (max-width: 767px) {
-      iframe {
-        height: 75vh;           /* достаточно места на мобилке */
-      }
-      .info {
-        margin-top: 15px;       /* чуть больше отступ для текста */
-      }
-      img {
-        max-height: 150px;      /* высокая гирлянда на мобилке */
-      }
+      iframe { height: 75vh; }
+      .info { margin-top: 15px; }
+      img { max-height: 150px; }
     }
   </style>
 </head>
 <body>
-  <!-- сам кроссворд -->
-  <iframe src="https://crossword.labirintschool.ru/?id=2053270"></iframe>
+  <!-- Кроссворд -->
+  <iframe id="crossword" src="https://crossword.labirintschool.ru/?id=2053270"></iframe>
 
-  <!-- текст-приветствие -->
+  <!-- Заглушка -->
+  <div class="fallback" id="fallback">
+     Кроссворд временно недоступен🧚‍♀️ Волшебные снежинки пока колдуют над кроссвордом…
+Скоро всё оживёт! Загляните чуть позже или обновите страничку ✨
+  </div>
+
+  <!-- Текст-приветствие -->
   <div class="info">
     Добро пожаловать в новогоднее приключение! ✨<br />
     Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄
   </div>
 
-  <!-- гирлянда -->
+  <!-- Гирлянда -->
   <img
     src="https://cdn.glitch.global/b673fcfe-234d-4711-aefd-efec3e3780aa/png-klev-club-zldj-p-girlyanda-yelka-png-16.png?v=1726154927306"
     alt="Новогодняя гирлянда"
   />
+
+  <script>
+    const iframe = document.getElementById('crossword');
+    const fallback = document.getElementById('fallback');
+
+    // Создаем временный iframe для проверки загрузки
+    const testIframe = document.createElement('iframe');
+    testIframe.style.display = 'none';
+    testIframe.src = iframe.src;
+
+    testIframe.onload = () => {
+      iframe.style.display = 'block';
+      fallback.style.display = 'none';
+    };
+
+    testIframe.onerror = () => {
+      fallback.style.display = 'block';
+    };
+
+    // Если в течение 5 секунд ничего не произошло — показать fallback
+    setTimeout(() => {
+      if (iframe.style.display !== 'block') {
+        fallback.style.display = 'block';
+      }
+    }, 5000);
+
+    // Добавляем iframe в DOM для загрузки (незаметно)
+    document.body.appendChild(testIframe);
+  </script>
 </body>
 </html>
