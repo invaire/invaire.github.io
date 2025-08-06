@@ -123,6 +123,28 @@
       }
     });
   });
+    function checkSolution() {
+  const cells = document.querySelectorAll('.cell input');
+  let allCorrect = true;
+
+  for (const input of cells) {
+    if (input.dataset.letter && input.value.toLowerCase() !== input.dataset.letter.toLowerCase()) {
+      allCorrect = false;
+      break;
+    }
+  }
+
+  if (allCorrect) {
+    document.getElementById('secret-message').style.display = 'block';
+  }
+}
+
+document.querySelectorAll('.cell input').forEach((input) => {
+  input.addEventListener('input', checkSolution);
+});
 </script>
+  <div id="secret-message" style="display:none; margin-top: 20px; font-size: 24px; font-weight: bold; color: darkred;">
+  ✨ Волшебство в сердце ✨
+</div>
 </body>
 </html>
