@@ -1,75 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Новогодний кроссворд</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      background-color: #f0f0f0;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding-bottom: 20px;
-      background-color: #fefcfa;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Новогодний кроссворд</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #fefcfa;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
 
-    iframe {
-       height: auto;
-       min-height: 400px;
-       aspect-ratio: 16 / 9;
-       max-width: 1200px;
-       width: 100%;
-    }
+        iframe {
+            width: 100%;
+            max-width: 1200px;
+            height: auto;
+            min-height: 400px;
+            aspect-ratio: 16 / 9;
+            border: none;
+        }
 
-    img {
-      width: 100%;
-      height: auto;
-      max-height: 100px; /* ограничим высоту */
-      object-fit: contain;
-      margin-top: 10px;
-    }
+        img {
+            width: 100%;
+            height: auto;
+            max-height: 100px;
+            object-fit: contain;
+            margin-top: 10px;
+        }
 
-    p {
-      font-size: 18px;
-      color: #333;
-      text-align: center;
-      padding: 16px;
-      margin: 10px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
-      max-width: 1500px;
-      line-height: 1.6;
-    }
-
-    @media (min-width: 768px) {
-      img {
-        display: none;
-      }
-    }
-
-    @media (max-width: 768px) {
-      iframe {
-        height: 75vh;
-      }
-      img {
-        height: 25vh;
-      }
-      p {
-        font-size: 16px;
-      }
-    }
-  </style>
+        .info {
+            font-family: "Segoe UI", sans-serif;
+            font-size: 18px;
+            background-color: #fff0f5;
+            border-radius: 12px;
+            padding: 10px 16px;
+            margin-top: 20px;
+            box-shadow: 0 0 12px #f4c3d6;
+            text-align: center;
+            max-width: 700px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-  <iframe src="https://learningapps.org/watch?v=p649o6q3n24"></iframe>
-  <p>Добро пожаловать в новогоднее приключение! 🌟 Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄</p>
-  <img src="https://cdn.glitch.global/b673fcfe-234d-4711-aefd-efec3e3780aa/png-klev-club-zldj-p-girlyanda-yelka-png-16.png?v=1726154927306" alt="Новогодняя картинка" />
+    <iframe src="https://crossword.labirintschool.ru/?id=2053270"></iframe>
+
+    <div class="info">
+        Добро пожаловать в новогоднее приключение! ✨<br />
+        Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄
+    </div>
+
+    <img src="https://cdn-icons-png.flaticon.com/512/8773/8773928.png" alt="Гирлянда" />
 </body>
 </html>
