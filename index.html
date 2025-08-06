@@ -5,10 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Кроссворд «Волшебство в сердце»</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      display: flex; justify-content: center; align-items: center; 
-      min-height: 100vh; margin: 0; background: #f4f4f4;
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      background: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: #336;
+      margin: 20px;
     }
     .crossword {
       display: grid;
@@ -19,98 +30,117 @@
       padding: 5px;
     }
     .cell {
-      width: 2.5em; height: 2.5em;
+      width: 2.5em;
+      height: 2.5em;
       background: #eee;
-      display: flex; justify-content: center; align-items: center;
-      font-size: 1.1em; font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.1em;
+      font-weight: bold;
       user-select: none;
       cursor: default;
       position: relative;
     }
-    .cell.blank { background: #444; }
-    .cell.start { cursor: pointer; background: #cce5ff; }
-    .cell.filled { color: #333; }
+    .cell.blank {
+      background: #444;
+    }
+    .cell.start {
+      cursor: pointer;
+      background: #cce5ff;
+    }
+    .cell.filled {
+      color: #333;
+    }
+    @media (max-width: 600px) {
+      .crossword {
+        transform: scale(0.85);
+      }
+    }
   </style>
 </head>
 <body>
+
+  <h1>Волшебство в сердце</h1>
   <div class="crossword" id="crossword"></div>
 
-<script>
-  const rows = 17, cols = 11;
-  const words = [
-    {text: 'СНЕГОВИК', row:1, col:2},
-    {text: 'КАКАО',    row:2, col:3},
-    {text: 'ЕЛКА',     row:3, col:6},
-    {text: 'МЕШОК',    row:4, col:5},
-    {text: 'СНЕГ',     row:5, col:5},
-    {text: 'БАЙБАЙ',   row:6, col:4},
-    {text: 'САНКИ',    row:7, col:7},
-    {text: 'КОНФЕТЫ',  row:8, col:2},
-    {text: 'ОЛИВЬЕ',   row:9, col:4},
-    {text: 'СНЕГУРОЧКА', row:10,col:1},
-    {text: 'СЕВЕР',    row:11,col:5},
-    {text: 'САНКИ',    row:12,col:7},
-    {text: 'ДЕТИ',     row:13,col:6},
-    {text: 'ПОДАРОК',  row:14,col:3},
-    {text: 'ЗВЕЗДА',   row:15,col:3},
-    {text: 'ЗАЯЦ',     row:16,col:4},
-    {text: 'ВЕДРО',    row:17,col:6}
-  ];
+  <script>
+    const rows = 17, cols = 11;
+    const words = [
+      {text: 'СНЕГОВИК', row:1, col:2},
+      {text: 'КАКАО',    row:2, col:3},
+      {text: 'ЕЛКА',     row:3, col:6},
+      {text: 'МЕШОК',    row:4, col:5},
+      {text: 'СНЕГ',     row:5, col:5},
+      {text: 'БАЙБАЙ',   row:6, col:4},
+      {text: 'САНКИ',    row:7, col:7},
+      {text: 'КОНФЕТЫ',  row:8, col:2},
+      {text: 'ОЛИВЬЕ',   row:9, col:4},
+      {text: 'СНЕГУРОЧКА', row:10, col:1},
+      {text: 'СЕВЕР',    row:11, col:5},
+      {text: 'САНКИ',    row:12, col:7},
+      {text: 'ДЕТИ',     row:13, col:6},
+      {text: 'ПОДАРОК',  row:14, col:3},
+      {text: 'ЗВЕЗДА',   row:15, col:3},
+      {text: 'ЗАЯЦ',     row:16, col:4},
+      {text: 'ВЕДРО',    row:17, col:6}
+    ];
 
-  const container = document.getElementById('crossword');
-  const grid = [];
+    const container = document.getElementById('crossword');
+    const grid = [];
 
-  for (let r = 1; r <= rows; r++) {
-    grid[r] = [];
-    for (let c = 1; c <= cols; c++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell blank';
-      cell.dataset.r = r;
-      cell.dataset.c = c;
-      container.appendChild(cell);
-      grid[r][c] = cell;
-    }
-  }
-
-  words.forEach((w,i) => {
-    const len = w.text.length;
-    for (let k = 0; k < len; k++) {
-      const r = w.row;
-      const c = w.col + k;
-      const cell = grid[r][c];
-      cell.classList.remove('blank');
-      cell.classList.add('cell');
-      cell.dataset.letter = w.text[k];
-      if (k === 0) {
-        cell.classList.add('start');
-        cell.title = 'Нажмите, чтобы ответить';
-        cell.dataset.index = i;
-        cell.addEventListener('click', startInput);
+    for (let r = 1; r <= rows; r++) {
+      grid[r] = [];
+      for (let c = 1; c <= cols; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell blank';
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        container.appendChild(cell);
+        grid[r][c] = cell;
       }
     }
-  });
 
-  function startInput(e) {
-    const idx = e.currentTarget.dataset.index;
-    const w = words[idx];
-    const answer = prompt('Введите слово:', '');
-    if (!answer) return;
-    if (answer.trim().toUpperCase() === w.text) {
-      fillWord(w);
-    } else {
-      alert('Неправильно, попробуйте ещё.');
-    }
-  }
+    words.forEach((w, i) => {
+      const len = w.text.length;
+      for (let k = 0; k < len; k++) {
+        const r = w.row;
+        const c = w.col + k;
+        const cell = grid[r][c];
+        cell.classList.remove('blank');
+        cell.classList.add('cell');
+        cell.dataset.letter = w.text[k];
+        if (k === 0) {
+          cell.classList.add('start');
+          cell.title = 'Нажмите, чтобы ответить';
+          cell.dataset.index = i;
+          cell.addEventListener('click', startInput);
+        }
+      }
+    });
 
-  function fillWord(w) {
-    for (let k = 0; k < w.text.length; k++) {
-      const r = w.row;
-      const c = w.col + k;
-      const cell = grid[r][c];
-      cell.textContent = w.text[k];
-      cell.classList.add('filled');
+    function startInput(e) {
+      const idx = e.currentTarget.dataset.index;
+      const w = words[idx];
+      const answer = prompt('Введите слово:', '');
+      if (!answer) return;
+      if (answer.trim().toUpperCase() === w.text.toUpperCase()) {
+        fillWord(w);
+      } else {
+        alert('Неправильно, попробуйте ещё.');
+      }
     }
-  }
-</script>
+
+    function fillWord(w) {
+      for (let k = 0; k < w.text.length; k++) {
+        const r = w.row;
+        const c = w.col + k;
+        const cell = grid[r][c];
+        cell.textContent = w.text[k];
+        cell.classList.add('filled');
+      }
+    }
+  </script>
+
 </body>
 </html>
