@@ -7,11 +7,12 @@
   <style>
     body {
       margin: 0;
-      padding: 0 0 5px;
+      padding: 0 0 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       background-color: #fefcfa;
+      font-family: "Segoe UI", sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -20,43 +21,29 @@
       width: 100%;
       max-width: 1200px;
       border: none;
-      display: none; /* Скрыт по умолчанию */
     }
 
-    .info {
-      font-family: "Segoe UI", sans-serif;
+    .info, .fallback {
       font-size: 18px;
       background-color: #fff0f5;
       border-radius: 12px;
       padding: 10px 16px;
-      margin-top: 10px;
+      margin: 15px 0 10px;
       box-shadow: 0 0 12px #f4c3d6;
       text-align: center;
       max-width: 700px;
       line-height: 1.5;
     }
 
+    .fallback {
+      display: none;
+    }
+
     img {
       width: 100%;
       max-width: 700px;
       height: auto;
-      max-height: 150px;
       object-fit: contain;
-      margin-top: 10px;
-    }
-
-    .fallback {
-      margin-top: 20px;
-      color: #444;
-      background: #fff6f6;
-      border: 1px solid #ffcccc;
-      padding: 16px 24px;
-      border-radius: 10px;
-      font-family: "Segoe UI", sans-serif;
-      font-size: 16px;
-      display: none;
-      max-width: 700px;
-      text-align: center;
     }
 
     @media (min-width: 768px) {
@@ -65,7 +52,6 @@
 
     @media (max-width: 767px) {
       iframe { height: 75vh; }
-      .info { margin-top: 15px; }
       img { max-height: 150px; }
     }
   </style>
@@ -76,47 +62,37 @@
 
   <!-- Заглушка -->
   <div class="fallback" id="fallback">
-     Кроссворд временно недоступен🧚‍♀️ Волшебные снежинки пока колдуют над кроссвордом…
-Скоро всё оживёт! Загляните чуть позже или обновите страничку ✨
+    Кроссворд временно недоступен 🧚 Волшебные снежинки пока колдуют над кроссвордом…<br />
+    Скоро всё оживёт! Загляните чуть позже или обновите страничку ✨
   </div>
 
-  <!-- Текст-приветствие -->
+  <!-- Приветствие -->
   <div class="info">
     Добро пожаловать в новогоднее приключение! ✨<br />
     Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄
   </div>
 
   <!-- Гирлянда -->
-  <img
-    <img src="https://invair.github.io/long-garland.png" alt="Новогодняя гирлянда" />
-  />
+  <img src="https://invair.github.io/long-garland.png" alt="Новогодняя гирлянда" />
 
   <script>
     const iframe = document.getElementById('crossword');
     const fallback = document.getElementById('fallback');
 
-    // Создаем временный iframe для проверки загрузки
+    // Проверка, загрузился ли iframe
     const testIframe = document.createElement('iframe');
     testIframe.style.display = 'none';
     testIframe.src = iframe.src;
 
     testIframe.onload = () => {
-      iframe.style.display = 'block';
-      fallback.style.display = 'none';
+      // Загружено успешно
     };
 
     testIframe.onerror = () => {
+      iframe.style.display = 'none';
       fallback.style.display = 'block';
     };
 
-    // Если в течение 5 секунд ничего не произошло — показать fallback
-    setTimeout(() => {
-      if (iframe.style.display !== 'block') {
-        fallback.style.display = 'block';
-      }
-    }, 5000);
-
-    // Добавляем iframe в DOM для загрузки (незаметно)
     document.body.appendChild(testIframe);
   </script>
 </body>
