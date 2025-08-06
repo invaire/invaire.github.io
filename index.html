@@ -1,62 +1,63 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Новогодний кроссворд</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #fefcfa;
-            overflow-x: hidden;
-            padding-bottom: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Новогодний кроссворд</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #fefcfa;
+      overflow-x: hidden;
+      padding-bottom: 20px;
+    }
 
-        iframe {
-            width: 100%;
-            max-width: 1200px;
-            height: auto;
-            min-height: 400px;
-            aspect-ratio: 16 / 9;
-            border: none;
-        }
+    iframe {
+      width: 100%;
+      max-width: 1200px;
+      height: auto;
+      min-height: 400px;
+      aspect-ratio: 16 / 9;
+      border: none;
+    }
 
-        img {
-            width: 100%;
-            height: auto;
-            max-height: 100px;
-            object-fit: contain;
-            margin-top: 10px;
-        }
+    .info {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 18px;
+      background-color: #fff0f5;
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-top: 20px;
+      box-shadow: 0 0 12px #f4c3d6;
+      text-align: center;
+      max-width: 700px;
+      line-height: 1.5;
+    }
 
-        .info {
-            font-family: "Segoe UI", sans-serif;
-            font-size: 18px;
-            background-color: #fff0f5;
-            border-radius: 12px;
-            padding: 10px 16px;
-            margin-top: 20px;
-            box-shadow: 0 0 12px #f4c3d6;
-            text-align: center;
-            max-width: 700px;
-            line-height: 1.5;
-        }
-    </style>
+    img {
+      width: 100%;
+      max-width: 700px;
+      height: auto;
+      max-height: 100px;
+      object-fit: contain;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    <iframe src="https://crossword.labirintschool.ru/?id=2053270"></iframe>
+  <iframe src="https://crossword.labirintschool.ru/?id=2053270"></iframe>
 
-    <div class="info">
-        Добро пожаловать в новогоднее приключение! ✨<br />
-        Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄
-    </div>
+  <div class="info">
+    Добро пожаловать в новогоднее приключение! ✨<br />
+    Помоги Деду Морозу разгадать тайны зимнего волшебства! 🎄
+  </div>
 
-    <img src="https://cdn-icons-png.flaticon.com/512/8773/8773928.png" alt="Гирлянда" />
+  <img src="https://cdn-icons-png.flaticon.com/512/8773/8773928.png" alt="Новогодняя гирлянда" />
 </body>
 </html>
