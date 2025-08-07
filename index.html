@@ -30,8 +30,8 @@
       padding: 5px;
     }
     .cell {
-      width: 2em;
-      height: 2em;
+      width: 2.5em;
+      height: 2.5em;
       background: #eee;
       display: flex;
       justify-content: center;
@@ -137,25 +137,25 @@
 
     const rows = 19, cols = 11;
     const words = [
-      {text: 'СНЕГОВИК', q: 'Три снежных шарика и морковка', row: 0, col: 1},
-      {text: 'КАКАО', q: 'Шоколадный напиток', row: 1, col: 2},
-      {text: 'ЕЛКА', q: 'Хвойное дерево', row: 2, col: 5},
-      {text: 'МЕШОК', q: 'В нем приносят кота', row: 3, col: 4},
-      {text: 'СНЕГ', q: 'Зимой бывает', row: 4, col: 4},
-      {text: 'БАЙБАЙ', q: 'Спи елочка ...', row: 5, col: 3},
-      {text: 'САНКИ', q: 'На них везут елку', row: 6, col: 6},
-      {text: 'КОНФЕТЫ', q: 'Сладкие штучки', row: 7, col: 1},
-      {text: 'ОЛИВЬЕ', q: 'Любимый салат', row: 8, col: 3},
-      {text: 'СНЕГУРОЧКА', q: 'Женщина снеговика', row: 9, col: 0},
+      {text: 'СНЕГОВИК', q: 'Стоит во дворе с морковкой вместо носа.', row: 0, col: 1, img: 'img/elka.jpg'},
+      {text: 'КАКАО', q: 'Какой волшебный шоколадный напиток пьют, чтобы согреться?', row: 1, col: 2},
+      {text: 'ЕЛКА', q: 'Как зовут новогоднее нарядное дерево?', row: 2, col: 5},
+      {text: 'МЕШОК', q: 'В чём Дед Мороз носит чудо и подарки?', row: 3, col: 4},
+      {text: 'СНЕГ', q: 'Он падает с неба и тает в ладошке.', row: 4, col: 4},
+      {text: 'БАЙБАЙ', q: 'Песенка: "Метель ей пела песенку, спи, ёлочка ...', row: 5, col: 3},
+      {text: 'САНКИ', q: 'Что мчится с горки и делает детей счастливыми?', row: 6, col: 6},
+      {text: 'КОНФЕТЫ', q: 'Яркие и сладкие, прячутся под ёлкой.', row: 7, col: 1},
+      {text: 'ОЛИВЬЕ', q: 'Какой салат обязательно стоит на новогоднем столе?', row: 8, col: 3},
+      {text: 'СНЕГУРОЧКА', q: 'Кто помогает Деду Морозу дарить подарки?', row: 9, col: 0},
       {text: '', q: '', row: 10, col: 0},
-      {text: 'СЕВЕР', q: 'Верхняя часть компаса', row: 11, col: 4},
+      {text: 'СЕВЕР', q: 'Где живёт Дед Мороз?', row: 11, col: 4},
       {text: '', q: '', row: 12, col: 0},
-      {text: 'САНКИ', q: 'На них везут елку', row: 13, col: 6},
-      {text: 'ДЕТИ', q: 'Находят в капусте', row: 14, col: 5},
-      {text: 'ПОДАРОК', q: 'То что дарят', row: 15, col: 2},
-      {text: 'ЗВЕЗДА', q: 'Солнце', row: 16, col: 2},
-      {text: 'ЗАЯЦ', q: 'Ушастый', row: 17, col: 3},
-      {text: 'ВЕДРО', q: 'В нем несут воду', row: 18, col: 5}
+      {text: 'САНТА', q: 'Кто летает на санях с оленями?', row: 13, col: 6},
+      {text: 'ДЕТИ', q: 'Кто верит в чудо и лепит снеговика?', row: 14, col: 5},
+      {text: 'ПОДАРОК', q: 'Что блестящее стоит под ёлкой?', row: 15, col: 2},
+      {text: 'ЗВЕЗДА', q: ' Что сверкает на макушке ёлки?', row: 16, col: 2},
+      {text: 'ЗАЯЦ', q: 'Кто скачет по снегу с длинными ушами?', row: 17, col: 3},
+      {text: 'ВЕДРО', q: 'Что стоит вместо шапки у снеговика?', row: 18, col: 5}
     ];
 
     const grid = [];
@@ -209,7 +209,7 @@
       modalInput.value = '';
       document.getElementById('submit-answer').dataset.index = idx;
 
-      const imagePath = `images/${currentWord.text.toLowerCase()}.png`;
+      const imagePath = currentWord.img || `img/${currentWord.text.toLowerCase()}.jpg`;
       const img = document.getElementById('question-image');
       img.src = imagePath;
       img.style.display = 'block';
