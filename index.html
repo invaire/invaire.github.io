@@ -237,6 +237,8 @@
       modalInput.value = '';
       document.getElementById('submit-answer').dataset.index = idx;
 
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
       const imagePath = currentWord.img || `img/${currentWord.text.toLowerCase()}.jpg`;
       const img = document.getElementById('question-image');
       img.src = imagePath;
@@ -284,6 +286,7 @@
         return;
       }
       modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
       currentWord = null;
       modalOpen = false;
     }
