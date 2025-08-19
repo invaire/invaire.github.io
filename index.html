@@ -45,6 +45,55 @@
       align-items: center;
       z-index: 1000;
     }
+    /* Лёгкая анимация праздника при клике на кнопку */
+    #startOverlay .start-content { 
+      position: relative; 
+      overflow: visible; 
+    }
+
+    /* Радужная вспышка из точки клика */
+    #startOverlay .start-content.flash::after{
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      background: radial-gradient(
+        circle at var(--x) var(--y),
+        rgba(255,255,255,.95) 0%,
+        rgba(255,255,255,.4) 35%,
+        rgba(255,255,255,0) 65%
+      );
+      animation: flash-out .6s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes flash-out{
+  from { opacity: .9; }
+  to   { opacity: 0; }
+    }
+
+    /* Искры */
+    .spark{
+      position: absolute;
+      left: 0; top: 0;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: hsl(var(--h) 90% 60%);
+      box-shadow: 0 0 8px hsl(var(--h) 90% 60%);
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      pointer-events: none;
+      animation: spark-fly .65s ease-out forwards;
+    }
+    @keyframes spark-fly{
+      0%   { opacity: 1; transform: translate(calc(-50% + 0px),   calc(-50% + 0px))   scale(1); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); }
+    }
+
+    /* Уважение к настройкам пользователя */
+    @media (prefers-reduced-motion: reduce){
+      .spark { animation: none; opacity: 0; }
+      #startOverlay .start-content.flash::after { animation: none; opacity: 0; }
+    }
 
     .start-content {
       background: white;
@@ -284,9 +333,46 @@
 
     startOverlay.style.display = "flex"; // показываем окно при старте
 
-    startBtn.addEventListener("click", () => {
-      startOverlay.style.display = "none"; // скрываем при нажатии
+    startBtn.addEventListener('click', () => {
+      const wrap = document.querySelector('#startOverlay .start-content');
+      const btnRect  = startBtn.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+
+      // Центр кнопки относительно контейнера
+      const cx = btnRect.left + btnRect.width / 2 - wrapRect.left;
+      const cy = btnRect.top  + btnRect.height / 2 - wrapRect.top;
+
+      // 1) Вспышка
+      wrap.style.setProperty('--x', cx + 'px');
+      wrap.style.setProperty('--y', cy + 'px');
+      wrap.classList.add('flash');
+
+      // 2) Искры
+      const hues = [45, 0, 200, 120, 300]; // золото, красный, синий, зелёный, розовый
+      const count = 18;
+      for (let i = 0; i < count; i++){
+        const s = document.createElement('span');
+        s.className = 'spark';
+        s.style.left = cx + 'px';
+        s.style.top  = cy + 'px';
+
+        const angle = (Math.PI * 2) * (i / count);
+        const speed = 40 + Math.random() * 40; // 40–80px
+        s.style.setProperty('--dx', Math.cos(angle) * speed + 'px');
+        s.style.setProperty('--dy', Math.sin(angle) * speed + 'px');
+        s.style.setProperty('--h', hues[i % hues.length]); // цвет крутим по кругу
+
+        wrap.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+
+      // 3) Скрываем оверлей чуть позже, чтоб анимация доиграла
+      document.getElementById('startOverlay').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('startOverlay').style.display = 'none';
+      }, 650);
     });
+
   });
 
     let currentWord = null;
