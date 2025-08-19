@@ -44,11 +44,21 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      transition: opacity 0.6s ease;
     }
     /* Лёгкая анимация праздника при клике на кнопку */
     #startOverlay .start-content { 
       position: relative; 
       overflow: visible; 
+      transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+    #startOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #startOverlay.hidden .start-content {
+      opacity: 0;
+      transform: scale(0.9); /* слегка уменьшается при исчезновении */
     }
 
     /* Радужная вспышка из точки клика */
@@ -67,22 +77,22 @@
       pointer-events: none;
     }
     @keyframes flash-out{
-  from { opacity: .9; }
-  to   { opacity: 0; }
+      from { opacity: .9; }
+      to   { opacity: 0; }
     }
 
     /* Искры */
     .spark{
       position: absolute;
       left: 0; top: 0;
-      width: 8px; height: 8px;
+      width: 12px; height: 12px;   /* Размер искр */
       border-radius: 50%;
       background: hsl(var(--h) 90% 60%);
       box-shadow: 0 0 8px hsl(var(--h) 90% 60%);
       transform: translate(-50%, -50%);
       opacity: 0;
       pointer-events: none;
-      animation: spark-fly .65s ease-out forwards;
+      animation: spark-fly 1.2s ease-out forwards;  /* скорость исчезания */
     }
     @keyframes spark-fly{
       0%   { opacity: 1; transform: translate(calc(-50% + 0px),   calc(-50% + 0px))   scale(1); }
@@ -326,52 +336,54 @@
   <div class="crossword" id="crossword"></div>
 
   <script>
-  // Окно приветствия
   document.addEventListener("DOMContentLoaded", () => {
-    const startOverlay = document.getElementById("startOverlay");
-    const startBtn = document.getElementById("startBtn");
+  const startBtn = document.querySelector('.start-content button');
 
-    startOverlay.style.display = "flex"; // показываем окно при старте
+  startBtn.addEventListener('click', () => {
+    const wrap = document.querySelector('#startOverlay .start-content');
+    const btnRect  = startBtn.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
 
-    startBtn.addEventListener('click', () => {
-      const wrap = document.querySelector('#startOverlay .start-content');
-      const btnRect  = startBtn.getBoundingClientRect();
-      const wrapRect = wrap.getBoundingClientRect();
+    // центр кнопки относительно контейнера
+    const cx = btnRect.left + btnRect.width  / 2 - wrapRect.left;
+    const cy = btnRect.top  + btnRect.height / 2 - wrapRect.top;
 
-      // Центр кнопки относительно контейнера
-      const cx = btnRect.left + btnRect.width / 2 - wrapRect.left;
-      const cy = btnRect.top  + btnRect.height / 2 - wrapRect.top;
+    // 1) вспышка
+    wrap.style.setProperty('--x', cx + 'px');
+    wrap.style.setProperty('--y', cy + 'px');
+    wrap.classList.add('flash');
 
-      // 1) Вспышка
-      wrap.style.setProperty('--x', cx + 'px');
-      wrap.style.setProperty('--y', cy + 'px');
-      wrap.classList.add('flash');
+    // 2) искры
+    const hues  = [45, 0, 200, 120, 300]; // золото, красный, синий, зелёный, розовый
+    const count = 18;
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('span');
+      s.className = 'spark';
+      s.style.left = cx + 'px';
+      s.style.top  = cy + 'px';
 
-      // 2) Искры
-      const hues = [45, 0, 200, 120, 300]; // золото, красный, синий, зелёный, розовый
-      const count = 18;
-      for (let i = 0; i < count; i++){
-        const s = document.createElement('span');
-        s.className = 'spark';
-        s.style.left = cx + 'px';
-        s.style.top  = cy + 'px';
+      const angle = (Math.PI * 2) * (i / count);
+      const speed = 150 + Math.random() * 100;    // разлет искр, размер
 
-        const angle = (Math.PI * 2) * (i / count);
-        const speed = 40 + Math.random() * 40; // 40–80px
-        s.style.setProperty('--dx', Math.cos(angle) * speed + 'px');
-        s.style.setProperty('--dy', Math.sin(angle) * speed + 'px');
-        s.style.setProperty('--h', hues[i % hues.length]); // цвет крутим по кругу
+      s.style.setProperty('--dx', Math.cos(angle) * speed + 'px');
+      s.style.setProperty('--dy', Math.sin(angle) * speed + 'px');
+      s.style.setProperty('--h',  hues[i % hues.length]);
 
-        wrap.appendChild(s);
-        s.addEventListener('animationend', () => s.remove());
-      }
+      wrap.appendChild(s);
+      s.addEventListener('animationend', () => s.remove());
+    }
 
-      // 3) Скрываем оверлей чуть позже, чтоб анимация доиграла
-      document.getElementById('startOverlay').classList.add('hidden');
-      setTimeout(() => {
-        document.getElementById('startOverlay').style.display = 'none';
-      }, 650);
-    });
+    // 3) исчезновение оверлея
+    const overlay = document.getElementById('startOverlay');
+
+    // Сначала запускаем анимацию исчезновения
+    overlay.classList.add('hidden');
+
+    // Полностью убираем только после окончания перехода (1.2s)
+    overlay.addEventListener('transitionend', () => {
+      overlay.style.display = 'none';
+    }, { once: true });
+  });
 
   });
 
