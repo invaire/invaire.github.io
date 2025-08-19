@@ -92,7 +92,7 @@
       transform: translate(-50%, -50%);
       opacity: 0;
       pointer-events: none;
-      animation: spark-fly 1.2s ease-out forwards;  /* скорость исчезания */
+      animation: spark-fly var(--dur, 1.2s) ease-out forwards;  /* скорость исчезания */
     }
     @keyframes spark-fly{
       0%   { opacity: 1; transform: translate(calc(-50% + 0px),   calc(-50% + 0px))   scale(1); }
@@ -354,20 +354,41 @@
     wrap.classList.add('flash');
 
     // 2) искры
-    const hues  = [45, 0, 200, 120, 300]; // золото, красный, синий, зелёный, розовый
-    const count = 18;
+    const hues  = [0, 45, 200, 120, 300]; // красный, жёлтый, зелёный, синий, розовый
+    const count = 40;  // размер фейерверка, много искр
     for (let i = 0; i < count; i++) {
       const s = document.createElement('span');
       s.className = 'spark';
       s.style.left = cx + 'px';
       s.style.top  = cy + 'px';
 
+      // угол + скорость
       const angle = (Math.PI * 2) * (i / count);
-      const speed = 150 + Math.random() * 100;    // разлет искр, размер
+      
+      // 🎇 случайный размер искры (от 6px до 16px)
+      const size = 4 + Math.random() * 20;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
 
+      // базовая скорость (150–250)
+      const base = 250 + Math.random() * 200; //скорость 250–450 px
+
+      // множитель: крупнее искра → медленнее летит (0.9..1.3)
+      const factor = 0.9 + (size / 16) * 0.4;  // Связь размера и скорости
+
+      // итоговая скорость
+      const speed = base * factor;
+
+      // ⏱ длительность: крупнее искра — дольше живёт (0.9s..1.8s)
+      const dur = 1.5 + (size / 16) * 1.5;  // 1.5–3s
+      s.style.setProperty('--dur', dur + 's');
+
+      // направление
       s.style.setProperty('--dx', Math.cos(angle) * speed + 'px');
       s.style.setProperty('--dy', Math.sin(angle) * speed + 'px');
-      s.style.setProperty('--h',  hues[i % hues.length]);
+
+      // цвет
+      s.style.setProperty('--h', hues[i % hues.length]);
 
       wrap.appendChild(s);
       s.addEventListener('animationend', () => s.remove());
