@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
             s.style.setProperty('--h', hues[i % hues.length]);
 
             wrap.appendChild(s);
-            // s.addEventListener('animationend', () => s.remove());
         }
 
         setTimeout(() => {
@@ -134,7 +133,6 @@ words.forEach((w, i) => {
         cell.classList.remove('blank');
         cell.classList.add('cell');
         cell.dataset.letter = w.text[k];
-        // cell.textContent = w.text[k];
 
         if (k === 0) {
             cell.classList.add('start');
@@ -148,14 +146,8 @@ words.forEach((w, i) => {
             number.classList.add('number');
             cell.appendChild(number);
         }
-
-        // if (w.m === k) {
-        //     cell.classList.add('mainWord');
-        // }
     }
 });
-
-
 
 // подсвечивает клетку буквы главной фразы после заполнения правильного слова
 function mainWordLetterShow() {
@@ -272,7 +264,6 @@ function fillWord(w) {
 }
 
 // показываем "Правильно!" и запускаем искры из центра угаданного слова
-
 function showCorrectAtWord(w) {
     // 1) Центр слова в пикселях
     const first = grid[w.row][w.col].getBoundingClientRect();
@@ -320,7 +311,6 @@ function showCorrectAtWord(w) {
         layer.appendChild(s);
         s.addEventListener('animationend', () => s.remove());
     }
-
 }
 
 // получает текущий элемент текущего слова (вспомогательная функция)
