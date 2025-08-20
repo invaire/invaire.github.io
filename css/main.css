@@ -1,0 +1,448 @@
+/*одна переменная — один размер клетки */
+:root {
+    --cell: clamp(22px, calc((100vw - 40px) / 11), 40px);
+    --grid-line: 1px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url('../img/FON.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* название */
+h1 {
+    color: #f8d14b;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Стартовое окно */
+#startOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.6s ease;
+}
+
+/* Лёгкая анимация праздника при клике на кнопку */
+#startOverlay .start-content {
+    position: relative;
+    overflow: visible;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+#startOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#startOverlay.hidden .start-content {
+    opacity: 0;
+    transform: scale(0.9);
+    /* слегка уменьшается при исчезновении */
+}
+
+/* Радужная вспышка из точки клика */
+#startOverlay .start-content.flash::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: radial-gradient(circle at var(--x) var(--y),
+            rgba(255, 255, 255, .95) 0%,
+            rgba(255, 255, 255, .4) 35%,
+            rgba(255, 255, 255, 0) 65%);
+    animation: flash-out .6s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes flash-out {
+    from {
+        opacity: .9;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* Искры */
+.spark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    /* Размер искр */
+    border-radius: 50%;
+    background: hsl(var(--h) 90% 60%);
+    box-shadow: 0 0 8px hsl(var(--h) 90% 60%);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    animation: spark-fly var(--dur, 1.2s) ease-out forwards;
+    /* скорость исчезания */
+}
+
+@keyframes spark-fly {
+    0% {
+        opacity: 1;
+        transform: translate(calc(-50% + 0px), calc(-50% + 0px)) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2);
+    }
+}
+
+/* Уважение к настройкам пользователя */
+@media (prefers-reduced-motion: reduce) {
+    .spark {
+        animation: none;
+        opacity: 0;
+    }
+
+    #startOverlay .start-content.flash::after {
+        animation: none;
+        opacity: 0;
+    }
+}
+
+.start-content {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.start-content h2 {
+    margin-bottom: 10px;
+}
+
+.start-content p {
+    margin-bottom: 15px;
+}
+
+.start-content button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f8d14b;
+    cursor: pointer;
+}
+
+/* список правил в стартовом окне */
+.rules {
+    list-style: none;
+    /* убираем стандартные точки */
+    padding: 0;
+    margin: 15px 0;
+    text-align: left;
+}
+
+.rules li {
+    margin-bottom: 10px;
+    padding-left: 0;
+    /* убираем лишний отступ */
+    display: flex;
+    /* снежинка + текст в одну линию */
+    align-items: center;
+    /* выравниваем по центру */
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.rules li::before {
+    content: "❄️";
+    margin-right: 8px;
+    /* расстояние между снежинкой и текстом */
+    font-size: 18px;
+    /* можно подогнать размер */
+}
+
+/* Контейнер кроссворда */
+.crossword {
+    display: grid;
+    grid-template-columns: repeat(11, var(--cell));
+    grid-template-rows: repeat(19, var(--cell));
+    gap: 0;
+    padding: 12px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, .6);
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    box-sizing: border-box;
+    /* важно */
+    max-width: 100vw;
+    /* чтобы не вылезало за экран */
+    width: calc(var(--cell) * 11 + 24px);
+    /* 24px = паддинг 12px слева + 12px справа */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .18), 0 2px 8px rgba(0, 0, 0, .12);
+    /* мягкая тень у блока кроссворда */
+}
+
+/* базовая клетка */
+.cell {
+    box-sizing: border-box;
+    /* рамка входит в размер клетки */
+    width: var(--cell);
+    height: var(--cell);
+    background: rgba(255, 255, 255, .9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(var(--cell) * .44);
+    /* масштаб цифр/букв */
+    font-weight: bold;
+    position: relative;
+    border: 1px solid transparent;
+    /* границу прячем… */
+    transition: background-color .15s ease, box-shadow .15s ease, transform .05s ease;
+    /* для плавности */
+    border-radius: 6px;
+    background-clip: padding-box;
+    /* чтобы фон не залезал под «линию» */
+    box-shadow: inset 0 0 0 1px #333;
+    /* …а линию рисуем инсет-тенью */
+}
+
+/* пустая (скрытая) клетка — та же геометрия, но полностью прозрачная */
+.cell.blank {
+    background: transparent;
+    box-shadow: inset 0 0 1px transparent;
+    /* чтобы не было внутренней линии */
+    border: 1px solid transparent;
+    /* и внешней тоже */
+}
+
+/* Клетки главного слова */
+.cell.mainWord {
+    background: #98fa87 !important;
+}
+
+.cell.mainWord:hover {
+    background: #98fa87 !important;
+}
+
+/* лёгкий «клик» пусть остается как был */
+.cell:not(.blank):active {
+    transform: translateY(1px);
+}
+
+/* подсветка не-пустых клеток */
+.cell:not(.blank):hover {
+    background-color: rgba(255, 255, 255, .96);
+    /* внутренняя тонкая линия + белое мягкое свечение + лёгкий голубой ореол */
+    box-shadow:
+        inset 0 0 0 1px #333,
+        0 0 10px 1px rgba(255, 255, 255, .85),
+        0 0 16px 5px rgba(120, 180, 255, .35);
+    z-index: 2;
+    /* чтобы ореол не перекрывали соседние клетки */
+}
+
+/* стартовая подсказка */
+.cell.start {
+    background: #cce5ff;
+    cursor: pointer;
+}
+
+.cell.start:hover {
+    background: #cce5ff !important;
+}
+
+.cell.filled {
+    color: #333;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .crossword {
+        padding: 8px;
+    }
+}
+
+/* Сообщение о правильном ответе */
+#correctMsg {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #ff6600;
+    box-shadow: 0 0 20px rgba(255, 165, 0, 0.6);
+    display: none;
+    z-index: 1000;
+}
+
+/* класс, которым мы будем перезапускать анимацию */
+.pop {
+    animation: pop 1s ease;
+}
+
+
+@keyframes pop {
+    0% {
+        transform: translateX(-50%) scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Слой для эффектов, перекрывает страницу, клики не перехватывает */
+#fxLayer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1500;
+}
+
+/* маленькие номера — без влияния на высоту клетки */
+.number {
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    font-size: 0.65rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* контейнер модалки */
+#modal {
+    display: none;
+    opacity: 0;
+    /*Плавное появление модального окна с подсказкой*/
+    transition: opacity .2s ease;
+    /*Плавное появление модального окна с подсказкой*/
+    position: fixed;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    z-index: 999;
+    background: rgba(0, 0, 0, .55);
+    justify-content: center;
+    align-items: center;
+    padding: clamp(8px, 4vw, 24px);
+    /* отступы от краёв экрана */
+    box-sizing: border-box;
+}
+
+/* САМО ОКНО — адаптивная ширина/высота */
+.modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+    padding: 16px;
+    width: min(92vw, 520px);
+    /* вместо фиксированных 400px */
+    max-height: min(86vh, 720px);
+    /* чтобы помещалось по высоте */
+    overflow: auto;
+    /* прокрутка, если контента много */
+    box-shadow: 0 0 20px rgba(0, 0, 0, .3);
+}
+
+/* когда показываем окно */
+#modal.show {
+    /* класс будем добавлять из JS */
+    opacity: 1;
+}
+
+/* сама «карточка» */
+#modal .modal-content {
+    transform: translateY(10px);
+    opacity: 0;
+    transition: transform .25s ease, opacity .25s ease;
+}
+
+#modal.show .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* картинка внутри — вписываемся в окно */
+.modal-content img {
+    width: 100%;
+    height: auto;
+    max-height: 48vh;
+    /* чтобы под картинкой помещалось поле и кнопка */
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
+    margin: 0 auto 12px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* поле ввода — на всю ширину и без zoom на iOS */
+#user-answer {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    /* 16px убирает авто-зум в iOS */
+}
+
+/* крестик чуть ближе к краю на мобильных */
+.close {
+    top: 8px;
+    right: 10px;
+}
+
+/* на узких экранах кнопку сделать широкой */
+@media (max-width:480px) {
+    #submit-answer {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+/* блокируем прокрутку фона, когда модалка открыта */
+body.modal-open {
+    overflow: hidden;
+}
+
+#submit-answer {
+    margin-top: 10px;
+    padding: 8px 16px;
+}
