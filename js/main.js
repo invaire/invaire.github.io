@@ -62,11 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // Сначала запускаем анимацию исчезновения
             overlay.classList.add('hidden');
         }, 1500);
-
-        // Полностью убираем только после окончания перехода (1.2s)
-        //overlay.addEventListener('transitionend', () => {
-        //    overlay.style.display = 'none';
-        //}, { once: true });
     });
 
 });
