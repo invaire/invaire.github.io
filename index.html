@@ -224,7 +224,40 @@
       h1{ font-size: 1.8rem; }
       .crossword{ padding: 8px; }
     }
-    
+    /* Сообщение о правильном ответе */
+    #correctMsg {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #ff6600;
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.6);
+      display: none;
+      z-index: 1000;
+    }
+    /* класс, которым мы будем перезапускать анимацию */
+    .pop {
+      animation: pop 1s ease;
+    }
+
+
+    @keyframes pop {
+      0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+      50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    } 
+    /* Слой для эффектов, перекрывает страницу, клики не перехватывает */
+    #fxLayer{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1500;
+    }
     /* маленькие номера — без влияния на высоту клетки */
     .number{
       position: absolute;
@@ -334,6 +367,9 @@
 
   <h1>Волшебство в сердце</h1>
   <div class="crossword" id="crossword"></div>
+
+  <div id="correctMsg">✨ Правильно!</div>
+  <div id="fxLayer"></div>
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -534,26 +570,37 @@
     });
 
     function checkAnswer() {
-      if (!currentWord) {
-        return;
-      }
+      if (!currentWord) return;
 
       const userAnswer = modalInput.value.trim().toUpperCase();
+
       if (userAnswer === currentWord.text) {
+        // 1) заполняем клетки + запускаем "Правильно!" и искры
         fillWord(currentWord);
-        closeModal();
+
+        // 2) даём анимации секунду поработать, затем прячем баннер и закрываем модалку
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            const msg = document.getElementById('correctMsg');
+            if (msg) msg.style.display = 'none';
+            closeModal();             // <— без аргументов
+          }, 1200);                   // подгони под длительность искр/баннера
+        });
+
       } else {
-        alert('☃️ Ого! Почти угадал, попробуй ещё разок');
+        alert('❄️ Ой! Почти угадал, попробуй ещё разок');
         modalInput.focus();
       }
     }
 
     function closeModal() {
-      if (!modalOpen) {
-        return;
-      }
+      if (!modalOpen) return;
+
       modal.classList.remove('show');
-      setTimeout(() => { modal.style.display = 'none'; }, 200); // дождаться анимации ~200мс
+      setTimeout(() => {               // дождаться CSS-анимации закрытия
+        modal.style.display = 'none';
+      }, 200);
+
       document.body.classList.remove('modal-open');
       currentWord = null;
       modalOpen = false;
@@ -569,6 +616,60 @@
         cell.textContent = w.text[k];
         cell.classList.add('filled');
       }
+    // вызываем анимацию
+    showCorrectAtWord(w);
+    }
+      
+    // показываем "Правильно!" и запускаем искры из центра угаданного слова
+      
+    function showCorrectAtWord(w){
+      // 1) Центр слова в пикселях
+      const first = grid[w.row][w.col].getBoundingClientRect();
+      const last  = grid[w.row][w.col + w.text.length - 1].getBoundingClientRect();
+      const cx = (first.left + last.right) / 2;
+      const cy = first.top - 10; // чуть выше слова
+
+      // 2) Сообщение "Правильно!"
+      const msg = document.getElementById('correctMsg');
+      msg.style.display = 'block';
+      msg.classList.remove('pop');
+      void msg.offsetWidth;   // перезапуск анимации
+      msg.classList.add('pop');
+
+      // 3) Искры
+      const layer = document.getElementById('fxLayer');
+      const hues = [45, 0, 200, 120, 300]; // цвета: золото, красный, синий, зелёный, розовый
+      const count = 18;
+
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('span');
+        s.className = 'spark';
+
+        // стартовая точка
+        s.style.left = cx + 'px';
+        s.style.top  = cy + 'px';
+
+        // угол разлёта
+        const angle = (Math.PI * 2) * (i / count);
+        const base = 150 + Math.random() * 100;
+        const size = 6 + Math.random() * 10;
+        const factor = 0.9 + (size / 16) * 0.4;
+        const speed = base * factor;
+        const dur = 1.1 + (size / 16) * 1.1;
+
+        // свойства частицы
+        s.style.setProperty('--dx', Math.cos(angle) * speed + 'px');
+        s.style.setProperty('--dy', Math.sin(angle) * speed + 'px');
+        s.style.setProperty('--h', hues[i % hues.length]);
+        s.style.setProperty('--dur', dur.toFixed(2));
+
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+
+        layer.appendChild(s);
+        s.addEventListener('animationend', () => s.remove());
+      }
+      
     }
   </script>
 </body>
