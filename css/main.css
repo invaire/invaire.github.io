@@ -306,7 +306,6 @@ h1 {
     animation: pop 1s ease;
 }
 
-
 @keyframes pop {
     0% {
         transform: translateX(-50%) scale(0.5);
