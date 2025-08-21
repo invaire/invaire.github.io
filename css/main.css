@@ -445,3 +445,49 @@ body.modal-open {
     margin-top: 10px;
     padding: 8px 16px;
 }
+
+#finalCongrats {
+    position: fixed;
+    left: 50%;
+    top: 14%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, .92);
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 20px;
+    color: #e65100;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .25);
+    z-index: 3600;
+    /* выше #fxLayer */
+    animation: final-pop .25s ease-out;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+@keyframes final-pop {
+    from {
+        transform: translateX(-50%) scale(.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+#finalCongrats .btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    background: #ffd54f;
+    color: #5d3500;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+}
+
+#finalCongrats .btn:active {
+    transform: translateY(1px);
+}

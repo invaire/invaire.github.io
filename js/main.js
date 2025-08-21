@@ -1,4 +1,7 @@
+// Стартовая точка
 document.addEventListener("DOMContentLoaded", () => {
+    keyboardSafeModal();
+
     const startBtn = document.querySelector('.start-content button');
 
     startBtn.addEventListener('click', () => {
@@ -109,6 +112,9 @@ const words = [
     { text: 'ВЕДРО', q: '✨ Что стоит вместо шапки у снеговика? (5 букв)', row: 18, col: 5, img: 'img/vedro.jpg', m: 1 }
 ];
 
+// Считаем только непустые слова
+const TOTAL_WORDS = words.filter(w => w.text && w.text.trim().length > 0).length;
+
 const grid = [];
 for (let r = 0; r < words.length; r++) {
     grid[r] = [];
@@ -161,17 +167,14 @@ function mainWordLetterShow() {
     }
 }
 
-// функция удаления клика по первой букве, вызывается после того, как ввели правильное слово
-function removeCellClick() {
-    const cells = getCurrentWordInGrid();
-    if (cells) {
-        cells[currentWord.col].removeEventListener('click', startInput);
-    }
-}
-
 // тыкнули на цифру
 function startInput(e) {
     e.preventDefault();
+
+    if (e.target.classList.contains('filled')) {
+        return;
+    }
+
     const idx = e.currentTarget.dataset.index;
     currentWord = words[idx];
 
@@ -191,6 +194,10 @@ function startInput(e) {
     modalInput.focus();
     modalOpen = true;
 }
+
+// Прогресс и флаг финала
+const solvedWords = new Set();
+let finalShown = false;
 
 // проверка ответа
 modalOk.onclick = checkAnswer;
@@ -215,12 +222,19 @@ function checkAnswer() {
     const userAnswer = modalInput.value.trim().toUpperCase();
 
     if (userAnswer === currentWord.text) {
-        // 0) Удаляем обработчик клика по первой букве
-        removeCellClick();
         // 1) заполняем клетки + запускаем "Правильно!" и искры
         fillWord(currentWord);
         // 1.1) подсвечиваем букву главной фразы
         mainWordLetterShow();
+
+        // засчитываем прогресс
+        solvedWords.add(currentWord.text);
+
+        if (!finalShown && solvedWords.size === TOTAL_WORDS) {
+            finalShown = true;
+            setTimeout(showFinalCelebration, 300);
+        }
+
         // 2) даём анимации секунду поработать, затем прячем баннер и закрываем модалку
         requestAnimationFrame(() => {
             setTimeout(() => {
@@ -234,6 +248,7 @@ function checkAnswer() {
         alert('❄️ Ой! Почти угадал, попробуй ещё разок');
         modalInput.focus();
     }
+    console.log(`Solved: ${solvedWords.size}/${TOTAL_WORDS}`);
 }
 
 function closeModal() {
@@ -247,6 +262,82 @@ function closeModal() {
     document.body.classList.remove('modal-open');
     currentWord = null;
     modalOpen = false;
+}
+
+// --- iOS: чтобы модалка была ровно над клавиатурой ---
+function keyboardSafeModal() {
+    const vv = window.visualViewport;        // iOS Safari: есть почти всегда
+    if (!vv) return;                         // если API нет — ничего не делаем
+
+    // запомним исходный padding-bottom у оверлея-модалки (#modal)
+    const basePadding = parseFloat(getComputedStyle(modal).paddingBottom) || 0;
+
+    function isOpen() {
+        return !!modalOpen && modal.style.display !== 'none';
+    }
+
+    // оценка высоты клавиатуры = разница между layout viewport и visual viewport
+    function keyboardHeight() {
+        const kb = window.innerHeight - (vv.height + vv.offsetTop);
+        return kb > 0 ? kb : 0;
+    }
+
+    function adjust() {
+        if (!isOpen()) return;
+
+        const kb = keyboardHeight();
+        const card = modal.querySelector('.modal-content');
+
+        if (kb > 0) {
+            // Поднимем всё содержимое модалки за счёт нижнего padding:
+            modal.style.paddingBottom = (basePadding + kb + 8) + 'px';
+
+            // Чтобы карточка гарантированно влезала в видимую область:
+            if (card) {
+                card.style.maxHeight = `min(86vh, ${Math.floor(vv.height - 24)}px)`;
+            } else {
+                // Клавиатура скрыта — возвращаем значения
+                modal.style.paddingBottom = basePadding + 'px';
+                if (card) card.style.maxHeight = '';
+            }
+        }
+
+        // Изменение видимого вьюпорта и его «прокрутка» во время показа клавиатуры
+        vv.addEventListener('resize', adjust);
+        vv.addEventListener('scroll', adjust);
+
+        // При фокусе на поле — чуть позже, когда клавиатура уже поднялась
+        modalInput.addEventListener('focus', () => setTimeout(adjust, 60));
+
+        // Вернуть значения при закрытии
+        const _close = closeModal;
+        window.closeModal = function () {
+            _close();
+            modal.style.paddingBottom = basePadding + 'px';
+            const card = modal.querySelector('.modal-content');
+            if (card) card.style.maxHeight = '';
+        };
+        // Вызовем подстройку сразу после открытия в startInput
+        window.__iosAdjustModal = adjust;
+    };
+
+    // Оборачиваем открытие/закрытие, чтобы подстроиться вовремя
+    const _open = startInput;
+    window.startInput = function (w) {
+        _open(w);
+        setTimeout(adjust, 60);
+    };
+
+    const _close = closeModal;
+    window.closeModal = function () {
+        _close();
+        modal.style.paddingBottom = basePadding + 'px';
+        const card = modal.querySelector('.modal-content');
+        if (card) card.style.maxHeight = '';
+    };
+
+    // На смену ориентации — пересчитать через паузу
+    window.addEventListener('orientationchange', () => setTimeout(adjust, 300));
 }
 
 // Заполняет клетки если правильно ввели
@@ -311,6 +402,96 @@ function showCorrectAtWord(w) {
         layer.appendChild(s);
         s.addEventListener('animationend', () => s.remove());
     }
+}
+// --- Финальный салют и поздравление ---
+function showFinalCelebration() {
+    const layer = document.getElementById('fxLayer');
+
+    // Canvas-эффекты: быстрее и плавнее, чем куча DOM-частиц
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.inset = '0';
+    canvas.style.pointerEvents = 'none';
+    layer.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+    const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
+
+    function resize() {
+        const rect = layer.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+        canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // масштабирование контекста
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles = [];
+    let running = true;
+
+    function burst(x, y, n = 80) {
+        for (let i = 0; i < n; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const spd = 2 + Math.random() * 4;
+            particles.push({
+                x, y,
+                vx: Math.cos(ang) * spd,
+                vy: Math.sin(ang) * spd - 1.2,
+                life: 60 + Math.random() * 20,
+                r: 2 + Math.random() * 2.2,
+                color: `hsl(${Math.floor(Math.random() * 360)},90%,60%)`
+            });
+        }
+    }
+
+    function tick() {
+        if (!running) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx; p.y += p.vy; p.vy += 0.045; p.life -= 1;
+            ctx.globalAlpha = Math.max(p.life / 80, 0);
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color; ctx.fill();
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    // Периодические залпы в разных точках
+    const timer = setInterval(() => {
+        const x = canvas.width * (0.15 + Math.random() * 0.7);
+        const y = canvas.height * (0.12 + Math.random() * 0.28);
+        burst(x, y, 80);
+    }, 500);
+
+    // Поздравительный баннер
+    const congr = document.createElement('div');
+    congr.id = 'finalCongrats';
+    congr.innerHTML = '✨ Ура! Все слова разгаданы! ✨';
+    document.body.appendChild(congr);
+
+    // Закрытие по клику
+    congr.addEventListener('click', () => {
+        running = false;
+        clearInterval(timer);
+        window.removeEventListener('resize', resize);
+        layer.removeChild(canvas);
+        congr.remove();
+    }, { once: true });
+
+    tick();
+
+    // Автозакрытие
+    setTimeout(() => {
+        running = false;
+        clearInterval(timer);
+        window.removeEventListener('resize', resize);
+        layer.removeChild(canvas);
+        setTimeout(() => congr.remove(), 800);
+    }, 4500);
 }
 
 // получает текущий элемент текущего слова (вспомогательная функция)
