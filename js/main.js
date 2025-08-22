@@ -1,7 +1,5 @@
 // Стартовая точка
 document.addEventListener("DOMContentLoaded", () => {
-    keyboardSafeModal();
-
     const startBtn = document.querySelector('.start-content button');
 
     startBtn.addEventListener('click', () => {
@@ -79,10 +77,12 @@ modal.innerHTML = `
         <p id="question-text"></p>
         <img id="question-image" src="" alt="" style="max-width: 100%; display: none;"/>
         <input type="text" id="user-answer" placeholder="Введите слово...">
-        <button id="submit-answer">ОК</button>
+        <div class="wrong-answer">❄️ Ой! Почти угадал, попробуй ещё разок</div>
+        <button class="btns" id="submit-answer">ОК</button>
       </div>
     `;
 document.body.appendChild(modal);
+const wrongText = modal.getElementsByClassName("wrong-answer");
 const
     modalOk = document.getElementById('submit-answer'),
     modalInput = document.getElementById('user-answer');
@@ -193,6 +193,8 @@ function startInput(e) {
     document.getElementById('modal').style.display = 'flex';
     modalInput.focus();
     modalOpen = true;
+
+    keyboardSafeModal();
 }
 
 // Прогресс и флаг финала
@@ -216,36 +218,44 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Проверяем ответ
 function checkAnswer() {
     if (!currentWord) return;
 
     const userAnswer = modalInput.value.trim().toUpperCase();
 
-    if (userAnswer === currentWord.text) {
-        // 1) заполняем клетки + запускаем "Правильно!" и искры
-        fillWord(currentWord);
-        // 1.1) подсвечиваем букву главной фразы
-        mainWordLetterShow();
+    hideWrongText();
 
+    if (userAnswer === currentWord.text) {
         // засчитываем прогресс
         solvedWords.add(currentWord.text);
+
+        // 1) заполняем клетки 
+        fillWord();
+
+        // 1.1) подсвечиваем букву главной фразы
+        mainWordLetterShow();
 
         if (!finalShown && solvedWords.size === TOTAL_WORDS) {
             finalShown = true;
             setTimeout(showFinalCelebration, 300);
+        } else {
+            // запускаем "Правильно!" и искры
+            // вызываем анимацию
+            showCorrectAtWord();
+            // 2) даём анимации секунду поработать, затем прячем баннер и закрываем модалку
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const msg = document.getElementById('correctMsg');
+                    if (msg) msg.style.display = 'none';
+                }, 1200);                   // подгони под длительность искр/баннера
+            });
         }
 
-        // 2) даём анимации секунду поработать, затем прячем баннер и закрываем модалку
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                const msg = document.getElementById('correctMsg');
-                if (msg) msg.style.display = 'none';
-                closeModal();             // <— без аргументов
-            }, 1200);                   // подгони под длительность искр/баннера
-        });
-
+        // 1.2) Закрываем окно ввода
+        closeModal();
     } else {
-        alert('❄️ Ой! Почти угадал, попробуй ещё разок');
+        showWrongText();
         modalInput.focus();
     }
     console.log(`Solved: ${solvedWords.size}/${TOTAL_WORDS}`);
@@ -253,6 +263,8 @@ function checkAnswer() {
 
 function closeModal() {
     if (!modalOpen) return;
+
+    hideWrongText();
 
     modal.classList.remove('show');
     setTimeout(() => {               // дождаться CSS-анимации закрытия
@@ -341,7 +353,12 @@ function keyboardSafeModal() {
 }
 
 // Заполняет клетки если правильно ввели
-function fillWord(w) {
+function fillWord() {
+    const w = currentWord;
+    if (!currentWord) {
+        return;
+    }
+
     for (let k = 0; k < w.text.length; k++) {
         const r = w.row;
         const c = w.col + k;
@@ -350,12 +367,15 @@ function fillWord(w) {
         cell.textContent = w.text[k];
         cell.classList.add('filled');
     }
-    // вызываем анимацию
-    showCorrectAtWord(w);
 }
 
 // показываем "Правильно!" и запускаем искры из центра угаданного слова
-function showCorrectAtWord(w) {
+function showCorrectAtWord() {
+    const w = currentWord;
+    if (!currentWord) {
+        return;
+    }
+
     // 1) Центр слова в пикселях
     const first = grid[w.row][w.col].getBoundingClientRect();
     const last = grid[w.row][w.col + w.text.length - 1].getBoundingClientRect();
@@ -470,7 +490,7 @@ function showFinalCelebration() {
     // Поздравительный баннер
     const congr = document.createElement('div');
     congr.id = 'finalCongrats';
-    congr.innerHTML = '✨ Ура! Все слова разгаданы! ✨';
+    congr.innerHTML = '✨Ура!✨<br>Все слова разгаданы!';
     document.body.appendChild(congr);
 
     // Закрытие по клику
@@ -484,7 +504,7 @@ function showFinalCelebration() {
 
     tick();
 
-    // Автозакрытие
+    Автозакрытие
     setTimeout(() => {
         running = false;
         clearInterval(timer);
@@ -498,4 +518,16 @@ function showFinalCelebration() {
 function getCurrentWordInGrid() {
     const r = currentWord.row;
     return grid[r];
+}
+
+function showWrongText() {
+    if (wrongText && wrongText[0]) {
+        wrongText[0].classList.add("show");
+    }
+}
+
+function hideWrongText() {
+    if (wrongText && wrongText[0]) {
+        wrongText[0].classList.remove("show");
+    }
 }
