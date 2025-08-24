@@ -20,9 +20,28 @@ body {
 
 /* название */
 h1 {
-    color: #f8d14b;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    text-align: center;             /* по центру */
+    font-size: 2rem;                /* крупный для компа */
+    font-weight: 700;               /* жирный */
+    color: #ffcc00;                 /* тёплый золотистый цвет */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* лёгкая тень для читаемости */
+    margin: 20px auto 12px;         /* отступы сверху и снизу */
+    line-height: 1.3;               /* комфортная высота строки */
+    display: inline-block;          /* чтобы фон подстраивался под текст */
+    background: rgba(255, 255, 255, 0.15); /* лёгкий полупрозрачный фон */
+    padding: 8px 14px;              /* отступы внутри */
+    border-radius: 12px;            /* скруглённые края */
 }
+  /* смайлы по краям */
+  h1 .emoji {
+    white-space: nowrap;
+}
+ /* адаптив для телефонов */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.4rem; /* уменьшаем текст */
+    padding: 6px 10px;
+  }
 
 .btns {
     display: inline-block;
