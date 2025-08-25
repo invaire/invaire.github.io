@@ -490,7 +490,7 @@ function showFinalCelebration() {
     // Поздравительный баннер
     const congr = document.createElement('div');
     congr.id = 'finalCongrats';
-    congr.innerHTML = '✨Ура!✨<br>Все слова разгаданы!<br>Загодай желание🪄';
+    congr.innerHTML = '✨Ура!✨<br>Все слова разгаданы!<br>Загодай желание🧚‍♀️';
     document.body.appendChild(congr);
 
     // Закрытие по клику
